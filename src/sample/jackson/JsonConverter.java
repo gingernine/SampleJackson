@@ -34,8 +34,11 @@ public class JsonConverter implements Encoder.Text<Object>, Decoder.Text<Object>
 
 	@Override
 	public Object decode(String s) throws DecodeException {
+
 		try {
 			Class<?> messageClass = this.getMessageClass();
+			//System.out.println(this.userProperties.get(ENDPOINT_CLASS));
+			//System.out.println(messageClass);
 			return this.mapper.readValue(s, messageClass);
 		} catch (IOException e) {
 			throw new DecodeException(s, "failed to decode message.", e);
@@ -51,15 +54,18 @@ public class JsonConverter implements Encoder.Text<Object>, Decoder.Text<Object>
 	}
 
 	private void initMessageClass() {
-		Class<?> endpointClass = (Class<?>)userProperties.get(ENDPOINT_CLASS);
+		Class<?> endpointClass = (Class<?>) userProperties.get(ENDPOINT_CLASS);
 
 		Method onMessageMethod = this.findOnMessageMethod(endpointClass);
+		//System.out.println(onMessageMethod);
 		Parameter messageParameter = this.findMessageParameter(onMessageMethod);
+		//System.out.println(messageParameter.getType());
 
 		this.messageClass = messageParameter.getType();
 	}
 
 	private Method findOnMessageMethod(Class<?> endpointClass) {
+		//System.out.println(endpointClass.getMethods());
 		return this.findFormArray(endpointClass.getMethods(), this::isOnMessageMethod, "method annotated by @OnMessage is not found");
 	}
 
